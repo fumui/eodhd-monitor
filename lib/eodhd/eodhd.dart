@@ -1,0 +1,1 @@
+export 'model/crypto_ticker.dart';

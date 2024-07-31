@@ -7,6 +7,12 @@ environment:
   sdk: '>=3.4.4 <4.0.0'
 
 dependencies:
+  bloc: ^8.1.0
+  bloc_concurrency: ^0.2.0
+  equatable: ^2.0.3
+  flutter_bloc: ^8.1.1
+  web_socket_channel: ^3.0.1
+  stream_transform: ^2.0.0
   flutter:
     sdk: flutter
 
