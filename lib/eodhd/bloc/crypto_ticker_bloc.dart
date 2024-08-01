@@ -1,10 +1,8 @@
 import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:eodhd_monitor/eodhd/eodhd.dart';
-import 'package:stream_transform/stream_transform.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'crypto_ticker_event.dart';
@@ -24,14 +22,28 @@ class CryptoTickerBloc extends Bloc<CryptoTickerEvent, CryptoTickerState> {
     if (state.hasReachedMax){
       add(UnsubscribedCryptoTicker(tickerCode: receivedCryptoTicker.tickerCode));
     }
-    if (state.tickers.isNotEmpty && state.tickers.last.timestamp.second == receivedCryptoTicker.timestamp.second){
-      return;
+    switch (receivedCryptoTicker.tickerCode){
+      case 'ETH-USD':
+        if (state.ETHUSDTickers.isNotEmpty && state.ETHUSDTickers.last.timestamp.second == receivedCryptoTicker.timestamp.second){
+          return;
+        }
+        emit(state.copyWith(
+          status: CryptoTickerStatus.subscribed,
+          ETHUSDTickers: List.from(state.ETHUSDTickers)..add(receivedCryptoTicker),
+          hasReachedMax: state.ETHUSDTickers.length >= 100
+        ));
+        break;
+      case 'BTC-USD':
+        if (state.BTCUSDTickers.isNotEmpty && state.BTCUSDTickers.last.timestamp.second == receivedCryptoTicker.timestamp.second){
+          return;
+        }
+        emit(state.copyWith(
+          status: CryptoTickerStatus.subscribed,
+          BTCUSDTickers: List.from(state.BTCUSDTickers)..add(receivedCryptoTicker),
+          hasReachedMax: state.BTCUSDTickers.length >= 100
+        ));
+        break;
     }
-    emit(state.copyWith(
-      status: CryptoTickerStatus.subscribed,
-      tickers: List.from(state.tickers)..add(receivedCryptoTicker),
-      hasReachedMax: state.tickers.length >= 100
-    ));
   }
 
   void _onSubscribedCryptoTicker(CryptoTickerEvent event, Emitter<CryptoTickerState> emit) async {

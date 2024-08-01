@@ -3,31 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class CryptoTickerChart extends StatefulWidget {
-  const CryptoTickerChart({super.key});
+class CryptoTickerChart extends StatelessWidget {
+  final String tickerCode;
+  const CryptoTickerChart({super.key, required this.tickerCode});
 
-  @override
-  State<CryptoTickerChart> createState() => _CryptoTickerChartState();
-}
-
-class _CryptoTickerChartState extends State<CryptoTickerChart> {
-  
-  @override
-  void initState() {
-    super.initState();
-    context.read<CryptoTickerBloc>().add(const SubscribedCryptoTicker(tickerCode: 'ETH-USD'));
-  }
   @override
   Widget build(BuildContext context) {
+    if (tickerCode.isEmpty) {
+      return const Center(child: Text('Please select a ticker'));
+    }
+    late final List<CryptoTicker> chartData;
+    switch (tickerCode) {
+      case 'ETH-USD':
+        chartData = context.select((CryptoTickerBloc bloc) => bloc.state.ETHUSDTickers);
+        break;
+      case 'BTC-USD':
+        chartData = context.select((CryptoTickerBloc bloc) => bloc.state.BTCUSDTickers);
+        break;
+    }
     return Center(
       child: SfCartesianChart(
         primaryXAxis: const CategoryAxis(),
         series: <FastLineSeries<CryptoTicker, DateTime>>[
           FastLineSeries<CryptoTicker, DateTime>(
-            dataSource: context.select((CryptoTickerBloc bloc) => bloc.state.tickers),
+            dataSource: chartData,
             yValueMapper: (CryptoTicker ticker, _) => double.parse(ticker.lastPrice),
             xValueMapper: (CryptoTicker ticker, _) => ticker.timestamp,
-          )
+          ),
         ],
       ),
     );
