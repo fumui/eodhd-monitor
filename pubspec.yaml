@@ -15,6 +15,7 @@ dependencies:
   stream_transform: ^2.0.0
   flutter:
     sdk: flutter
+  syncfusion_flutter_charts: ^26.2.7
 
 dev_dependencies:
   flutter_test:

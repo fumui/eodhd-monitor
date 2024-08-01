@@ -6,7 +6,7 @@ class CryptoTicker extends Equatable{
   final String quantity;
   final String dailyChangePercentage;
   final String dailyDifference;
-  final int timestampMs;
+  final DateTime timestamp;
 
   const CryptoTicker({
     required this.tickerCode,
@@ -14,9 +14,9 @@ class CryptoTicker extends Equatable{
     required this.quantity,
     required this.dailyChangePercentage,
     required this.dailyDifference,
-    required this.timestampMs
+    required this.timestamp
   });
 
   @override
-  List<Object?> get props => [tickerCode, lastPrice, quantity, dailyChangePercentage, dailyDifference, timestampMs];
+  List<Object?> get props => [tickerCode, lastPrice, quantity, dailyChangePercentage, dailyDifference, timestamp];
 }

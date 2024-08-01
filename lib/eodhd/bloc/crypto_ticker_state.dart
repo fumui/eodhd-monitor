@@ -27,12 +27,13 @@ final class CryptoTickerState extends Equatable {
   CryptoTickerState copyWith({
     CryptoTickerStatus? status,
     List<CryptoTicker>? tickers,
+    bool? hasReachedMax,
     String? errorMessage
   }) {
     return CryptoTickerState(
       status: status ?? this.status,
       tickers: tickers ?? this.tickers,
-      hasReachedMax: hasReachedMax,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       errorMessage: errorMessage ?? this.errorMessage
     );
   }

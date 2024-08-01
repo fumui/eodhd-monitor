@@ -8,4 +8,29 @@ sealed class CryptoTickerEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-final class ReceiveCryptoTicker extends CryptoTickerEvent {}
+final class SubscribedCryptoTicker extends CryptoTickerEvent {
+  final String tickerCode;
+
+  const SubscribedCryptoTicker({required this.tickerCode});
+
+  @override
+  List<Object?> get props => [tickerCode];
+}
+
+final class UnsubscribedCryptoTicker extends CryptoTickerEvent {
+  final String tickerCode;
+
+  const UnsubscribedCryptoTicker({required this.tickerCode});
+
+  @override
+  List<Object?> get props => [tickerCode];
+}
+
+final class ReceivedCryptoTicker extends CryptoTickerEvent {
+  final CryptoTicker ticker;
+
+  const ReceivedCryptoTicker({required this.ticker});
+
+  @override
+  List<Object?> get props => [ticker];
+}
