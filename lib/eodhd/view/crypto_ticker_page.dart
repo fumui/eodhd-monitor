@@ -1,6 +1,6 @@
 import 'package:eodhd_monitor/eodhd/eodhd.dart';
 import 'package:eodhd_monitor/eodhd/widget/crypto_ticker_chart.dart';
-import 'package:eodhd_monitor/eodhd/widget/crypto_ticker_table.dart';
+import 'package:eodhd_monitor/eodhd/widget/crypto_ticker_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -16,20 +16,15 @@ class CryptoTickerPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crypto Ticker'),
+        title: const Text('Crypto Ticker', style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: BlocProvider(
         create: (_) =>  CryptoTickerBloc(wsChannel: channel)..add(const SubscribedCryptoTicker(tickerCode: 'ETH-USD,BTC-USD')),
         child: const Column(
           children: <Widget>[
             Expanded(
-              child: CryptoTickerTable(),
-            ),
-            Expanded(
-              child: CryptoTickerChart(tickerCode: 'ETH-USD'),
-            ),
-            Expanded(
-              child: CryptoTickerChart(tickerCode: 'BTC-USD'),
+              child: CryptoTickerList(),
             ),
           ],
         ),
