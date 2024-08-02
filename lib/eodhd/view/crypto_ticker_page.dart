@@ -1,6 +1,4 @@
 import 'package:eodhd_monitor/eodhd/eodhd.dart';
-import 'package:eodhd_monitor/eodhd/widget/crypto_ticker_chart.dart';
-import 'package:eodhd_monitor/eodhd/widget/crypto_ticker_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';

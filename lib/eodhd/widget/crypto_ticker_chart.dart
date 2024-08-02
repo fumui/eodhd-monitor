@@ -11,22 +11,23 @@ class CryptoTickerChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (tickerCode.isEmpty) {
-      return const Center(child: Text('Please select a ticker'));
+      return const Center(child: Text('Please add a ticker'));
     }
-    late final List<CryptoTicker> chartData;
-    switch (tickerCode) {
-      case 'ETH-USD':
-        chartData = context.select((CryptoTickerBloc bloc) => bloc.state.ETHUSDTickers);
-        break;
-      case 'BTC-USD':
-        chartData = context.select((CryptoTickerBloc bloc) => bloc.state.BTCUSDTickers);
-        break;
-    }
+    final List<CryptoTicker> chartData = context.select((CryptoTickerBloc bloc) => bloc.state.tickersMap[tickerCode] ?? []);
     return Center(
       child: SfCartesianChart(
+        // enableAxisAnimation: true,
         primaryXAxis: DateTimeAxis(
           interval: 10,
-          dateFormat: DateFormat.Hms(),
+          dateFormat: DateFormat.ms(),
+          majorGridLines: const MajorGridLines(width: 1, dashArray: [1,5], color: Colors.grey),
+          majorTickLines: const MajorTickLines(size: 5, width: 2, color: Colors.grey),
+          minorGridLines: const MinorGridLines(width: 1, dashArray: [1,5], color: Colors.grey),
+        ),
+        primaryYAxis: const NumericAxis(
+          majorGridLines: MajorGridLines(width: 1, dashArray: [1,5], color: Colors.grey),
+          majorTickLines: MajorTickLines(size: 5, width: 2, color: Colors.grey),
+          minorGridLines: MinorGridLines(width: 1, dashArray: [1,5], color: Colors.grey),
         ),
         series: <FastLineSeries<CryptoTicker, DateTime>>[
           FastLineSeries<CryptoTicker, DateTime>(
@@ -35,6 +36,12 @@ class CryptoTickerChart extends StatelessWidget {
             xValueMapper: (CryptoTicker ticker, _) => ticker.timestamp,
           ),
         ],
+        zoomPanBehavior: ZoomPanBehavior(
+          enablePinching: true,
+          enablePanning: true,
+          enableSelectionZooming: true,
+          zoomMode: ZoomMode.x,
+        ),
       ),
     );
   }

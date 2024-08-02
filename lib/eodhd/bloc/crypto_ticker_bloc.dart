@@ -19,31 +19,22 @@ class CryptoTickerBloc extends Bloc<CryptoTickerEvent, CryptoTickerState> {
 
   void _onReceivedCryptoTicker(CryptoTickerEvent event, Emitter<CryptoTickerState> emit) async {
     final receivedCryptoTicker = (event as ReceivedCryptoTicker).ticker;
-    if (state.hasReachedMax){
-      add(UnsubscribedCryptoTicker(tickerCode: receivedCryptoTicker.tickerCode));
+    if (state.tickersMap.containsKey(receivedCryptoTicker.tickerCode) && state.tickersMap[receivedCryptoTicker.tickerCode]!.isNotEmpty && state.tickersMap[receivedCryptoTicker.tickerCode]!.last.timestamp.second == receivedCryptoTicker.timestamp.second){
+      return;
     }
-    switch (receivedCryptoTicker.tickerCode){
-      case 'ETH-USD':
-        if (state.ETHUSDTickers.isNotEmpty && state.ETHUSDTickers.last.timestamp.second == receivedCryptoTicker.timestamp.second){
-          return;
-        }
-        emit(state.copyWith(
-          status: CryptoTickerStatus.subscribed,
-          ETHUSDTickers: List.from(state.ETHUSDTickers)..add(receivedCryptoTicker),
-          hasReachedMax: state.ETHUSDTickers.length >= 100
-        ));
-        break;
-      case 'BTC-USD':
-        if (state.BTCUSDTickers.isNotEmpty && state.BTCUSDTickers.last.timestamp.second == receivedCryptoTicker.timestamp.second){
-          return;
-        }
-        emit(state.copyWith(
-          status: CryptoTickerStatus.subscribed,
-          BTCUSDTickers: List.from(state.BTCUSDTickers)..add(receivedCryptoTicker),
-          hasReachedMax: state.BTCUSDTickers.length >= 100
-        ));
-        break;
-    }
+    final Map<String, List<CryptoTicker>> updatedTickersMap = Map.from(state.tickersMap)
+      ..update(
+        receivedCryptoTicker.tickerCode, 
+        (value) {
+          if (value.length >= 60) value.removeRange(0, value.length-59);
+          return List.from(value)..add(receivedCryptoTicker);
+        }, 
+        ifAbsent: () => [receivedCryptoTicker]
+      );
+    emit(state.copyWith(
+      status: CryptoTickerStatus.subscribed,
+      tickersMap: updatedTickersMap,
+    ));
   }
 
   void _onSubscribedCryptoTicker(CryptoTickerEvent event, Emitter<CryptoTickerState> emit) async {

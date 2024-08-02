@@ -4,50 +4,45 @@ enum CryptoTickerStatus { initial, subscribed, unsubscribed, error }
 
 final class CryptoTickerState extends Equatable {
   final CryptoTickerStatus status;
-  final List<CryptoTicker> ETHUSDTickers;
-  final List<CryptoTicker> BTCUSDTickers;
-  final bool hasReachedMax;
-  final String errorMessage;
+  final Map<String, List<CryptoTicker>> tickersMap;
 
   const CryptoTickerState({
     required this.status,
-    required this.ETHUSDTickers,
-    required this.BTCUSDTickers,
-    required this.hasReachedMax,
-    required this.errorMessage
+    required this.tickersMap,
   });
 
   factory CryptoTickerState.initial() {
     return const CryptoTickerState(
       status: CryptoTickerStatus.initial,
-      ETHUSDTickers: [],
-      BTCUSDTickers: [],
-      hasReachedMax: false,
-      errorMessage: ''
+      tickersMap: {},
     );
   }
 
   CryptoTickerState copyWith({
     CryptoTickerStatus? status,
-    List<CryptoTicker>? ETHUSDTickers,
-    List<CryptoTicker>? BTCUSDTickers,
+    Map<String, List<CryptoTicker>>? tickersMap,
     bool? hasReachedMax,
     String? errorMessage
   }) {
     return CryptoTickerState(
       status: status ?? this.status,
-      ETHUSDTickers: ETHUSDTickers ?? this.ETHUSDTickers,
-      BTCUSDTickers: BTCUSDTickers ?? this.BTCUSDTickers,
-      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
-      errorMessage: errorMessage ?? this.errorMessage
+      tickersMap: tickersMap ?? this.tickersMap,
     );
+  }
+
+  String getLastTickersState() {
+    var s = '';
+    tickersMap.forEach((key, value) {
+      s+= '$key: ${value.last.timestamp.millisecondsSinceEpoch} | ';
+    });
+    return s;
   }
 
   @override
   String toString() {
-    return '''CryptoTickerState { status: $status, hasReachedMax: $hasReachedMax, errorMessage: $errorMessage, ETHUSDTickers: ${ETHUSDTickers.length}, BTCUSDTickers: ${BTCUSDTickers.length} }''';
+    return '''CryptoTickerState { status: $status, tickers: ${getLastTickersState()} }''';
   }
 
   @override
-  List<Object?> get props => [status, ETHUSDTickers, BTCUSDTickers, hasReachedMax, errorMessage];
+  List<Object?> get props => [status, getLastTickersState()];
 }

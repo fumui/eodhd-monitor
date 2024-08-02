@@ -1,5 +1,4 @@
 import 'package:eodhd_monitor/eodhd/eodhd.dart';
-import 'package:eodhd_monitor/eodhd/widget/stock_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,14 +14,10 @@ class _CryptoTickerListState extends State<CryptoTickerList> {
   @override
   Widget build(BuildContext context) {
     final List<CryptoTicker> stockData = [];
-    final etcusd = context.select((CryptoTickerBloc bloc) => bloc.state.ETHUSDTickers);
-    if (etcusd.isNotEmpty) {
-      stockData.add(etcusd.last);
-    }
-    final btcusd = context.select((CryptoTickerBloc bloc) => bloc.state.BTCUSDTickers);
-    if (btcusd.isNotEmpty) {
-      stockData.add(btcusd.last);
-    }
+    context.select((CryptoTickerBloc bloc) => bloc.state.tickersMap)
+      .forEach((key, value) {
+        stockData.add(value.last);
+      });
     if (stockData.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
