@@ -9,7 +9,24 @@ class CryptoTickerList extends StatefulWidget {
   State<CryptoTickerList> createState() => _CryptoTickerListState();
 }
 
-class _CryptoTickerListState extends State<CryptoTickerList> {
+class _CryptoTickerListState extends State<CryptoTickerList> with WidgetsBindingObserver {
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print('AppLifecycleState in _CryptoTickerListState: $state');
+    if (state == AppLifecycleState.resumed) {
+      context.read<CryptoTickerBloc>().add(const SubscribedCryptoTicker(tickerCode: 'ETH-USD,BTC-USD'));
+    } else if (state == AppLifecycleState.paused) {
+      context.read<CryptoTickerBloc>().add(const UnsubscribedCryptoTicker(tickerCode: 'ETH-USD,BTC-USD', closeChannel: true));
+    } 
+  }
   var _expandedIndex = -1;
   @override
   Widget build(BuildContext context) {

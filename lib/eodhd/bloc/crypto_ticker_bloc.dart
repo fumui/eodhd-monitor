@@ -9,9 +9,9 @@ part 'crypto_ticker_event.dart';
 part 'crypto_ticker_state.dart';
 
 class CryptoTickerBloc extends Bloc<CryptoTickerEvent, CryptoTickerState> {
-  final WebSocketChannel wsChannel;
+  WebSocketChannel? wsChannel;
 
-  CryptoTickerBloc({required this.wsChannel}) : super(CryptoTickerState.initial()) {
+  CryptoTickerBloc() : super(CryptoTickerState.initial()) {
     on<ReceivedCryptoTicker>(_onReceivedCryptoTicker);
     on<SubscribedCryptoTicker>(_onSubscribedCryptoTicker);
     on<UnsubscribedCryptoTicker>(_onUnsubscribedCryptoTicker);
@@ -42,18 +42,28 @@ class CryptoTickerBloc extends Bloc<CryptoTickerEvent, CryptoTickerState> {
       _initializeWebSocket();
     }
     final data = jsonEncode({'action': 'subscribe', 'symbols': (event as SubscribedCryptoTicker).tickerCode});
-    wsChannel.sink.add(data);
+    wsChannel!.sink.add(data);
     emit(state.copyWith(status: CryptoTickerStatus.subscribed));
   }
 
   void _onUnsubscribedCryptoTicker(CryptoTickerEvent event, Emitter<CryptoTickerState> emit) async {
-    final data = jsonEncode({'action': 'unsubscribe', 'symbols': (event as UnsubscribedCryptoTicker).tickerCode});
-    wsChannel.sink.add(data);
-    emit(state.copyWith(status: CryptoTickerStatus.unsubscribed));
+    event as UnsubscribedCryptoTicker;
+    final data = jsonEncode({'action': 'unsubscribe', 'symbols': event.tickerCode});
+    wsChannel!.sink.add(data);
+    if (!event.closeChannel){
+      emit(state.copyWith(status: CryptoTickerStatus.unsubscribed));
+    } else {
+      wsChannel!.sink.close();
+      wsChannel = null;
+      emit(state.copyWith(status: CryptoTickerStatus.initial));
+    }
   }
 
   void _initializeWebSocket() {
-    wsChannel.stream
+    wsChannel = WebSocketChannel.connect(
+      Uri.parse('wss://ws.eodhistoricaldata.com/ws/crypto?api_token=demo'),
+    );
+    wsChannel!.stream
       .listen((event) {
         final data = jsonDecode(event);
         if (data['s'] != null){

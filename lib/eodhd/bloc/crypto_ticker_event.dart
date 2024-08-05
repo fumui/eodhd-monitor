@@ -19,8 +19,8 @@ final class SubscribedCryptoTicker extends CryptoTickerEvent {
 
 final class UnsubscribedCryptoTicker extends CryptoTickerEvent {
   final String tickerCode;
-
-  const UnsubscribedCryptoTicker({required this.tickerCode});
+  final bool closeChannel;
+  const UnsubscribedCryptoTicker({required this.tickerCode, this.closeChannel = false});
 
   @override
   List<Object?> get props => [tickerCode];
